@@ -631,57 +631,53 @@ static sqinline NSMutableDictionary * jsonObjectFormObject(id self){
                 value = [value valueKey];
             }
         }
-        BOOL ismore = NO;
+        NSArray *moresComp = nil;
         NSDictionary *replaceNames = respendsToSelectorReplacePropertyName(modelClass);
-        if (replaceNames!=nil) {
-            NSString *replaceName = replaceNames[key];
-            if (replaceName) {
-                NSString *moreKey = [key copy];
-                key = replaceName;
-                NSDictionary *moresKeys = _classPropertyKeyMoresCounts[NSStringFromClass(modelClass)];
-                if (moresKeys!=nil) {
-                    NSArray *moresComp = moresKeys[moreKey];
-                    if (moresComp) {
-                        ismore = YES;
-                        NSMutableDictionary *values = dict;
-                        for (int i = 0, over = (int)moresComp.count; i < over; i++) {
-                            NSString *moreKey = nil;
-                            if (i != over - 1) {
-                                moreKey = moresComp[i + 1];
-                            }
-                            if (moreKey) {
-                                id tempSuperDict = values[moresComp[i]];
-                                if (tempSuperDict == nil) {
-                                    tempSuperDict = [NSMutableDictionary new];
-                                    values[moresComp[i]] = tempSuperDict;
-                                }
-                                
-                                values = tempSuperDict;
-                                
-                             }else{
-                                 @try {
-                                     if (value==nil) return;
-                                     if (values[moresComp[i]] == nil) {
-                                         values[moresComp[i]] = value;
-                                     }
-                                 } @catch (NSException *exception) {
-                                     NSLog(@"MMModel is error %@",exception);
-                                 }
-                                 
-                            }
-                        }
-                       
-                    }
-                }
+        if (replaceNames && replaceNames[key]) {
+            NSDictionary *moresKeys = _classPropertyKeyMoresCounts[NSStringFromClass(modelClass)];
+            if (moresKeys && moresKeys[key]) {
+                moresComp = moresKeys[key];
+            }else{
+                key = replaceNames[key];
             }
         }
-        
-        if (ismore)return;
-        
-       //赋值
-        if (value!=nil && value != [NSNull null] ) {
+        if (moresComp) {
+            NSMutableDictionary *values = dict;
+            for (int i = 0, over = (int)moresComp.count; i < over; i++) {
+                NSString *nextKey = nil;
+                if (i != over - 1) {
+                    nextKey = moresComp[i + 1];
+                }
+                if (nextKey) {
+                    id tempSuperDict = values[moresComp[i]];
+                    if (tempSuperDict == nil) {
+                        tempSuperDict = [NSMutableDictionary new];
+                        values[moresComp[i]] = tempSuperDict;
+                    }
+                    
+                    values = tempSuperDict;
+                    
+                }else{
+                    @try {
+                        if (value==nil) return;
+                        if (values[moresComp[i]] == nil) {
+                            values[moresComp[i]] = value;
+                        }
+                    } @catch (NSException *exception) {
+                        NSLog(@"MMModel is error %@",exception);
+                    }
+                    
+                }
+            }
             
-            dict[key] = value;
+        }else{
+            
+            //赋值
+            if (value!=nil && value != [NSNull null] ) {
+                
+                dict[key] = value;
+            }
+            
         }
     }];
     
