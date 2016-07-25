@@ -13,6 +13,10 @@
 		C534EDB21D45D744006B92CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C534EDB01D45D744006B92CA /* Main.storyboard */; };
 		C534EDB41D45D744006B92CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C534EDB31D45D744006B92CA /* Assets.xcassets */; };
 		C534EDB71D45D744006B92CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C534EDB51D45D744006B92CA /* LaunchScreen.storyboard */; };
+		C534EDC41D45D755006B92CA /* NSObject+SQLExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */; };
+		C534EDC51D45D755006B92CA /* SQLProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC31D45D755006B92CA /* SQLProperty.m */; };
+		C534EDC81D45D760006B92CA /* jsonModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC71D45D760006B92CA /* jsonModel.m */; };
+		C534EDCB1D45E5A9006B92CA /* mappingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDCA1D45E5A9006B92CA /* mappingModel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +30,15 @@
 		C534EDB31D45D744006B92CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C534EDB61D45D744006B92CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C534EDB81D45D744006B92CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C534EDBF1D45D755006B92CA /* MMModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMModel.h; sourceTree = "<group>"; };
+		C534EDC01D45D755006B92CA /* NSObject+SQLExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SQLExtension.h"; sourceTree = "<group>"; };
+		C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SQLExtension.m"; sourceTree = "<group>"; };
+		C534EDC21D45D755006B92CA /* SQLProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLProperty.h; sourceTree = "<group>"; };
+		C534EDC31D45D755006B92CA /* SQLProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLProperty.m; sourceTree = "<group>"; };
+		C534EDC61D45D760006B92CA /* jsonModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsonModel.h; sourceTree = "<group>"; };
+		C534EDC71D45D760006B92CA /* jsonModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = jsonModel.m; sourceTree = "<group>"; };
+		C534EDC91D45E5A9006B92CA /* mappingModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mappingModel.h; sourceTree = "<group>"; };
+		C534EDCA1D45E5A9006B92CA /* mappingModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mappingModel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +71,15 @@
 		C534EDA61D45D744006B92CA /* MMModel */ = {
 			isa = PBXGroup;
 			children = (
+				C534EDBE1D45D755006B92CA /* MMModel */,
 				C534EDAA1D45D744006B92CA /* AppDelegate.h */,
 				C534EDAB1D45D744006B92CA /* AppDelegate.m */,
 				C534EDAD1D45D744006B92CA /* ViewController.h */,
 				C534EDAE1D45D744006B92CA /* ViewController.m */,
+				C534EDC61D45D760006B92CA /* jsonModel.h */,
+				C534EDC71D45D760006B92CA /* jsonModel.m */,
+				C534EDC91D45E5A9006B92CA /* mappingModel.h */,
+				C534EDCA1D45E5A9006B92CA /* mappingModel.m */,
 				C534EDB01D45D744006B92CA /* Main.storyboard */,
 				C534EDB31D45D744006B92CA /* Assets.xcassets */,
 				C534EDB51D45D744006B92CA /* LaunchScreen.storyboard */,
@@ -77,6 +95,18 @@
 				C534EDA81D45D744006B92CA /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C534EDBE1D45D755006B92CA /* MMModel */ = {
+			isa = PBXGroup;
+			children = (
+				C534EDBF1D45D755006B92CA /* MMModel.h */,
+				C534EDC01D45D755006B92CA /* NSObject+SQLExtension.h */,
+				C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */,
+				C534EDC21D45D755006B92CA /* SQLProperty.h */,
+				C534EDC31D45D755006B92CA /* SQLProperty.m */,
+			);
+			path = MMModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,8 +181,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				C534EDAF1D45D744006B92CA /* ViewController.m in Sources */,
+				C534EDC81D45D760006B92CA /* jsonModel.m in Sources */,
 				C534EDAC1D45D744006B92CA /* AppDelegate.m in Sources */,
+				C534EDC41D45D755006B92CA /* NSObject+SQLExtension.m in Sources */,
+				C534EDCB1D45E5A9006B92CA /* mappingModel.m in Sources */,
 				C534EDA91D45D744006B92CA /* main.m in Sources */,
+				C534EDC51D45D755006B92CA /* SQLProperty.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
