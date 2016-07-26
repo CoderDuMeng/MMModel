@@ -443,28 +443,24 @@ static sqinline void objectValueFromJsonObject(id self,id dict){
                 case _typeChar:
                 case _typebool:
                     if ([value isKindOfClass:[NSString class]]) {
-                        
                         if ([value isEqualToString:@"YES"] ||
-                            [value isEqualToString:@"yes"]) {
-                            
+                            [value isEqualToString:@"yes"]||
+                            [value isEqualToString:@"true"] ||
+                            [value isEqualToString:@"TRUE"]) {
                             ((void(*)(id,SEL,BOOL))(void *)objc_msgSend)(self,selector,1);
                             
-                        }else if ([value isEqualToString:@"true"] ||
+                        }else if ([value isEqualToString:@"false"] ||
+                                  [value isEqualToString:@"FALSE"] ||
                                   [value isEqualToString:@"NO"] ||
                                   [value isEqualToString:@"no"]){
-                            
                             ((void(*)(id,SEL,BOOL))(void *)objc_msgSend)(self,selector,0);
                             
                         }else{
-                            
                             NSString *charStr = (NSString *) value;
-                            
                             ((void(*)(id,SEL,char))(void *)objc_msgSend)(self,selector,(char )charStr.UTF8String);
                         }
-                        
                     }else{
                         ((void(*)(id,SEL,char))(void *)objc_msgSend)(self,selector,[value charValue]);
-                        
                     }
                     break;
                 case _typeShort:
