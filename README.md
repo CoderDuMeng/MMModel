@@ -18,7 +18,7 @@
  
 ## Demo里面的模型类 
 
--- **jsonModel**
+jsonModel
 ```objc
 @interface jsonModel : NSObject
 @property (assign , nonatomic) int age;
@@ -39,7 +39,7 @@
 @end
 
 ```
--- **blackModel**  
+blackModel 
 ```objc 
 @interface blackModel : NSObject
 @property (copy, nonatomic)NSString *appName;
@@ -56,7 +56,7 @@ return @[@"appName",@"appType"];
 @end
 ```
 
---** whiteModel**
+whiteModel
 ```objc 
 @interface whiteModel : NSObject
 @property (copy, nonatomic)NSString *appName;
@@ -73,7 +73,7 @@ return @[@"appName",@"appType"];
 
 ```
 
---** mappingModel** 
+mappingModel 
 ```objc 
 @interface mappingModel : NSObject
 @property (strong , nonatomic) NSString *name;
@@ -89,7 +89,7 @@ return @{
 }
 @end
 ````
---** arrayPropertyModel** 
+arrayPropertyModel
 ```objc 
 @interface arrayPropertyModel : NSObject
 
@@ -268,7 +268,7 @@ return @{
         NSLog(@"whiteJson:%@",model.mm_jsonWithModelObject);
    ```
 ##  归档  
-     ```objc
+```objc
          在接档和归档的方法里面实现分别实现这个两行
            
         -(instancetype)initWithCoder:(NSCoder *)aDecoder{
@@ -281,5 +281,5 @@ return @{
         [self mm_ModelEncode:aCoder];
 
         }
-     
-      ```
+
+```
