@@ -211,8 +211,7 @@ static sqinline id  propertyKey(NSString *key , Class cl,id dict){
 - (void)enumerateProperty:(void(^)(SQLProperty *property))block{
     //检查黑白名单
     Class selfClass = self.class;
-    BOOL isWhiteBlack = blackWhiteListProperty(selfClass);
-    respendsToSelectorReplacePropertyName(selfClass);
+ 
     NSString *c = NSStringFromClass(selfClass);
     NSMutableArray *classPros = _classPropertyValues[c];
     if (classPros&&classPros.count!=0) {
@@ -222,7 +221,8 @@ static sqinline id  propertyKey(NSString *key , Class cl,id dict){
             }
         }
     }else{
-    
+     BOOL isWhiteBlack = blackWhiteListProperty(selfClass);
+     respendsToSelectorReplacePropertyName(selfClass);
      classPros = [NSMutableArray new];
         
     //找父类
@@ -251,11 +251,10 @@ static sqinline id  propertyKey(NSString *key , Class cl,id dict){
                 
          free(ivars);
             
-        _classPropertyValues[c] = classPros;
            
     }
 }];
-     
+ _classPropertyValues[c] = classPros;
 }
 
 }
@@ -321,21 +320,13 @@ static sqinline void objectValueFromJsonObject(id self,id dict){
                         ((void(*)(id,SEL,id))(void *)objc_msgSend)(self,selector,value);
                     }
                     
-                }else if ([value isKindOfClass:[NSString class]]){
-                    value = [NSMutableString stringWithString:value];
-                    // is NSURL Class
-                    if (classType == [NSURL class]) {
-                        NSURL *urlValue = (NSURL *)value;
-                        ((void(*)(id,SEL,NSURL *))(void *)objc_msgSend)(self,selector,urlValue);
-                        
-                    }else if (classType == [NSDate class]){
-                        
+                }else if (classType == [NSDate class]){
+                    if ([value isKindOfClass:[NSString class]]) {
                         NSDate *date = nil;
                         {
                             NSDateFormatter *formatter = [NSDateFormatter  new];
                             formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
                             date =  [formatter dateFromString:(NSString *)value];
-                            
                         }
                         {
                             NSDateFormatter *formatter = [NSDateFormatter  new];
@@ -348,20 +339,29 @@ static sqinline void objectValueFromJsonObject(id self,id dict){
                             formatter.dateFormat = @"HH:mm:ss";
                             date = [formatter dateFromString:(NSString *)value];
                         }
-                        
                         if (date) {
                             ((void(*)(id,SEL,NSDate *))(void *)objc_msgSend)(self,selector,date);
                         }
-                    }else if (classType == [NSValue class]){
-                        // is NSValue Class
-                        NSDecimalNumber *decNum = [NSDecimalNumber decimalNumberWithString:value];
-                        NSDecimal dec = decNum.decimalValue;
-                        if (dec._length == 0 && dec._isNegative) {
-                            decNum = nil;
-                        }
-                        ((void (*)(id, SEL, id))(void *) objc_msgSend)(self, selector, decNum);
+                    }else if([value isKindOfClass:[NSDate class]]){
+                        ((void(*)(id,SEL,NSDate *))(void *)objc_msgSend)(self,selector,value);
                     }
+                } else if (classType == [NSValue class]){
+                    // is NSValue Class
+                    NSDecimalNumber *decNum = [NSDecimalNumber decimalNumberWithString:value];
+                    NSDecimal dec = decNum.decimalValue;
+                    if (dec._length == 0 && dec._isNegative) {
+                        decNum = nil;
+                    }
+                    ((void (*)(id, SEL, id))(void *) objc_msgSend)(self, selector, decNum);
                     
+                }else if (classType == [NSURL class]){
+                    if ([value isKindOfClass:[NSURL class]]) {
+                        ((void (*)(id, SEL, NSURL *))(void *) objc_msgSend)(self, selector, value);
+                    }else{
+                        NSURL *urlValue = [NSURL URLWithString:value];
+                        ((void (*)(id, SEL, NSURL *))(void *) objc_msgSend)(self, selector, urlValue);
+                        
+                    }
                     
                 } else if (classType==[NSDictionary class]||
                            classType==[NSMutableDictionary class]){
