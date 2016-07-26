@@ -11,14 +11,12 @@
 @interface mappingModel : NSObject
 @property (strong , nonatomic) NSString *name;
 @property (strong , nonatomic) NSDictionary *dict;
-
 @end
 
 
 @interface arrayPropertyModel : NSObject
 
 @property (strong , nonatomic) NSArray *models;
-
 
 
 @end
