@@ -32,7 +32,8 @@ typedef enum {
 @property (assign , nonatomic ,readonly) SEL setSel; // SEL set
 @property (assign , nonatomic ,readonly) BOOL isModelClass;  //is model
 @property (assign , nonatomic,readonly) type_ typeCode;  //type int
-
-
-
+@property (assign , nonatomic) BOOL isMoresKeys;  //是否有多级映射
+@property (assign , nonatomic) BOOL isReplaceKeys; //是否有替换的key
+@property (strong , nonatomic) NSString *PropertyReplaceName;  //替换key
+@property (strong , nonatomic) NSArray *PropertyMoresKeys;    //多级映射
 @end

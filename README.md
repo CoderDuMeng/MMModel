@@ -1,20 +1,17 @@
 # MMModel
 ### 使用简单的数据转模型 模型转数据 
 ##  字典转模型这种类型的框架处理速度快的重要一点其实就是缓存节省时间取某一个值 和类型匹配
-- **_classPropertyValues 字典** 缓存属性模型 
-- **_classPropertyReplaceValues   字典** 缓存替换的属性Name 
-- **_classPropertyBlackListValues 字典** 缓存黑名单属性
-- **_classPropertyWhiteListValues 字典** 缓存白名单属性 
-- **_classPropertyKeyMoresCounts  字典** 缓存多级映射的key
-- **_classPropertyClassInArrays   字典** 缓存数组字典Class
+    超快的轻量级框架
+    暂时不支持的类型  'IMP' ''SEL' 'CGRect' 'CGPoint'  等等一些结构体和不是对象 也不是基础数据类型 
   
 ## 功能 
 - **字典转模型** 
 - **模型转字典**  
 - **黑名单处理** 加在黑名单里面的属性 转模型 模型转字典 归档 都会处理
 - **白名单处理** 加在白名单里面的属性 转模型 模型转字典 归档 都会处理
-- **归档** 
-- **属性替换**          
+- **归档**框架里面有一个MMCode一个宏 一行代码归档解档
+- **属性替换** 
+- **新值替换旧值** 一个属性自定义转换类型 
  
 ## Demo里面的模型类 
 
@@ -28,7 +25,7 @@ jsonModel
 @property (assign , nonatomic) BOOL is;
 @end
 ```
--- **ObjectModel** 
+ObjectModel
 ```objc
 @interface ObjectModel : NSObject
 
@@ -39,7 +36,7 @@ jsonModel
 @end
 
 ```
-blackModel 
+#blackModel 
 ```objc 
 @interface blackModel : NSObject
 @property (copy, nonatomic)NSString *appName;
@@ -56,7 +53,7 @@ return @[@"appName",@"appType"];
 @end
 ```
 
-whiteModel
+#whiteModel
 ```objc 
 @interface whiteModel : NSObject
 @property (copy, nonatomic)NSString *appName;
@@ -73,7 +70,7 @@ return @[@"appName",@"appType"];
 
 ```
 
-mappingModel 
+#mappingModel 
 ```objc 
 @interface mappingModel : NSObject
 @property (strong , nonatomic) NSString *name;
@@ -89,7 +86,7 @@ return @{
 }
 @end
 ````
-arrayPropertyModel
+#arrayPropertyModel
 ```objc 
 @interface arrayPropertyModel : NSObject
 
@@ -108,178 +105,178 @@ return @{
 
 ## 简单的json转模型  
 ```objc
-            NSDictionary *json = @{
-            @"age":@"100",
-            @"name" :@"ios",
-            @"source":@"zhongguo",
-            @"price" :@"13.1",
-            @"is" :@YES
-            };
+NSDictionary *json = @{
+@"age":@"100",
+@"name" :@"ios",
+@"source":@"zhongguo",
+@"price" :@"13.1",
+@"is" :@YES
+};
 
-            jsonModel *model = [jsonModel mm_ModelObjectWithDictJson:json];
-            NSLog(@"age:%zi  name:%@ source:%@ prcie:%2f is:%zi",model.age,model.name,model.source,model.price,model.is);
+jsonModel *model = [jsonModel mm_ModelObjectWithDictJson:json];
+NSLog(@"age:%zi  name:%@ source:%@ prcie:%2f is:%zi",model.age,model.name,model.source,model.price,model.is);
 
-            NSLog(@"json -> model  %@",model.mm_jsonWithModelObject);
+NSLog(@"json -> model  %@",model.mm_jsonWithModelObject);
 
 ```
 ## 多级映射取值
 ```objc
-            NSDictionary *json = @{
-            @"json":@{
-            @"name" :@"dumeng",
-            @"dict" : @{
+NSDictionary *json = @{
+@"json":@{
+@"name" :@"dumeng",
+@"dict" : @{
 
-            @"age" :@"1",
+@"age" :@"1",
 
-            }
+}
 
-            },
+},
 
-            };
-
-
-            //解释：  mappingModel 里面的name取 字典里面的一个key是字典里面的值 取最里面字典的值 多级映射
-            /*  
-            需要在model类里面实现这样的代码  
-            +(NSDictionary *)mm_replacePropertyName{
-            return @{
-            @"name" :@"json.name",
-            @"dict" :@"json.dict"
-
-            };
-
-            }
-            */
-            mappingModel *model = [mappingModel mm_ModelObjectWithDictJson:json];
+};
 
 
-            NSLog(@"name:%@  dict:%@",model.name,model.dict);
+//解释：  mappingModel 里面的name取 字典里面的一个key是字典里面的值 取最里面字典的值 多级映射
+/*  
+需要在model类里面实现这样的代码  
++(NSDictionary *)mm_replacePropertyName{
+return @{
+@"name" :@"json.name",
+@"dict" :@"json.dict"
 
-            NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
+};
+
+}
+*/
+mappingModel *model = [mappingModel mm_ModelObjectWithDictJson:json];
+
+
+NSLog(@"name:%@  dict:%@",model.name,model.dict);
+
+NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
 
 ```
 ##  模型类型作为属性
 ```objc
-            NSDictionary *json = @{
-            @"json":@{
-            @"age":@"100",
-            @"name" :@"ios",
-            @"source":@"zhongguo",
-            @"price" :@"13.1",
-            @"is" :@YES
-            },
+NSDictionary *json = @{
+@"json":@{
+@"age":@"100",
+@"name" :@"ios",
+@"source":@"zhongguo",
+@"price" :@"13.1",
+@"is" :@YES
+},
 
 
-            @"json1":@{ @"age":@"200",
-            @"name" :@"iosJson",
-            @"source":@"zhongguoNIhao",
-            @"price" :@"32.3",
-            @"is" :@YES
+@"json1":@{ @"age":@"200",
+@"name" :@"iosJson",
+@"source":@"zhongguoNIhao",
+@"price" :@"32.3",
+@"is" :@YES
 
-            }
-            };
-            //模型作为属性
-            ObjectModel *model = [ObjectModel mm_ModelObjectWithDictJson:json];
+}
+};
+//模型作为属性
+ObjectModel *model = [ObjectModel mm_ModelObjectWithDictJson:json];
 
-            NSLog(@"%zi  %@",model.json.age, model.json1.name);
+NSLog(@"%zi  %@",model.json.age, model.json1.name);
 
 
-            NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
+NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
 
 ```
 ##   数组字典转数组模型
 ```objc
-            NSDictionary *json = @{
-            @"models" :@[@
-                         {@"name":@"dumeng",
-                         @"dict":@{@"age":@"100",
-                        @"name":@"dict" 
-                       }
-                     },
-                        @{@"name":@"dumeng",
-                        @"dict":@{@"age":@"100",
-                        @"name":@"dict"
+NSDictionary *json = @{
+@"models" :@[@
+             {@"name":@"dumeng",
+             @"dict":@{@"age":@"100",
+            @"name":@"dict" 
+           }
+         },
+            @{@"name":@"dumeng",
+            @"dict":@{@"age":@"100",
+            @"name":@"dict"
 
-                     }
-                  }
-                   ,
-                       @{@"name":@"dumeng",
-                        @"dict":@{@"age":@"100",
-                        @"name":@"dict"
+         }
+      }
+       ,
+           @{@"name":@"dumeng",
+            @"dict":@{@"age":@"100",
+            @"name":@"dict"
 
-                    }
-                   }
-                 ]
+        }
+       }
+     ]
 
-            };
+};
 
 
-            arrayPropertyModel *model = [arrayPropertyModel mm_ModelObjectWithDictJson:json];
+arrayPropertyModel *model = [arrayPropertyModel mm_ModelObjectWithDictJson:json];
 
-            NSLog(@"models:%@",model.models);
+NSLog(@"models:%@",model.models);
 
-            NSLog(@"json: %@",model.mm_jsonWithModelObject);
+NSLog(@"json: %@",model.mm_jsonWithModelObject);
 ```
 ## 黑名单 
 ```objc
-        NSDictionary *json = @{@"appName":@"ios",
-        @"appType":@"VR",
-        @"appSize":@"100M",
-        @"appColor":@"white"
+NSDictionary *json = @{@"appName":@"ios",
+@"appType":@"VR",
+@"appSize":@"100M",
+@"appColor":@"white"
 
-        };
+};
 
-        /*
+/*
 
-        //加入黑名单的属性 所有属性里面 只是不处理黑名单的属性
+//加入黑名单的属性 所有属性里面 只是不处理黑名单的属性
 
-        +(NSArray *)mm_blackPropertyList{
++(NSArray *)mm_blackPropertyList{
 
-        return @[@"appName",@"appType"];
+return @[@"appName",@"appType"];
 
-        }
-        */
-        blackModel *model = [blackModel mm_ModelObjectWithDictJson:json];
+}
+*/
+blackModel *model = [blackModel mm_ModelObjectWithDictJson:json];
 
-        NSLog(@"blackJson:%@",model.mm_jsonWithModelObject);
+NSLog(@"blackJson:%@",model.mm_jsonWithModelObject);
 ```
 ##  白名单  
 
   ```objc
-        NSDictionary *json = @{@"appName":@"ios",
-        @"appType":@"VR",
-        @"appSize":@"100M",
-        @"appColor":@"white"
+NSDictionary *json = @{@"appName":@"ios",
+@"appType":@"VR",
+@"appSize":@"100M",
+@"appColor":@"white"
 
-        };
+};
 
-        /*
-        //加入白名单的属性 所有属性里面 只是处理白名单里面的属性
-        +(NSArray *)mm_whitePropertyList{
+/*
+//加入白名单的属性 所有属性里面 只是处理白名单里面的属性
++(NSArray *)mm_whitePropertyList{
 
-        return @[@"appName",@"appType"];
+return @[@"appName",@"appType"];
 
-        }
+}
 
-        */
+*/
 
-        whiteModel *model = [whiteModel mm_ModelObjectWithDictJson:json];
+whiteModel *model = [whiteModel mm_ModelObjectWithDictJson:json];
 
-        NSLog(@"whiteJson:%@",model.mm_jsonWithModelObject);
+NSLog(@"whiteJson:%@",model.mm_jsonWithModelObject);
    ```
 ##  归档  
 ```objc
-         在接档和归档的方法里面实现分别实现这个两行
+ 在解档和归档的方法里面实现分别实现这个两行  还可以使用 MMCode 这个宏
            
-        -(instancetype)initWithCoder:(NSCoder *)aDecoder{
-        if (self=[super  init]) {
-        [self mm_ModelDecode:aDecoder];
-        }
-        return self;
-        }
-        -(void)encodeWithCoder:(NSCoder *)aCoder{
-        [self mm_ModelEncode:aCoder];
+-(instancetype)initWithCoder:(NSCoder *)aDecoder{
+if (self=[super  init]) {
+[self mm_ModelDecode:aDecoder];
+}
+return self;
+}
+-(void)encodeWithCoder:(NSCoder *)aCoder{
+[self mm_ModelEncode:aCoder];
 
-        }
+}
 
 ```
