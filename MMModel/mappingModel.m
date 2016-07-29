@@ -9,6 +9,7 @@
 #import "mappingModel.h"
 #import "MMModel.h"
 @implementation mappingModel
+MMCode
 +(NSDictionary *)mm_replacePropertyName{
     return @{
              @"name" :@"json.name",
@@ -19,6 +20,7 @@
 @end
 
 @implementation arrayPropertyModel
+MMCode
 +(NSDictionary *)mm_propertyClassInArray{
     return @{
              @"models":[mappingModel class]  //models 这个属性里面装着  mappingModel 这个对象

@@ -22,14 +22,15 @@ typedef enum {
     _typeChar , // char
     _typeShort // short
 }type_;
+
+
+
 @interface SQLProperty : NSObject
 -(instancetype)initWithIvar:(Ivar )ivar class:(Class )c;
 @property (assign , nonatomic , readonly) Class modelClass; //self model class
-@property (copy , nonatomic , readonly) NSMutableString *propertyName;  //property name
+@property (copy   , nonatomic , readonly) NSString *propertyName;  //property name
 @property (assign , nonatomic ,readonly) Class ClassType; //model Class
 @property (copy ,nonatomic, readonly) NSString *type; // model type
-@property (assign , nonatomic ,readonly) SEL getSel; // SEL get
-@property (assign , nonatomic ,readonly) SEL setSel; // SEL set
 @property (assign , nonatomic ,readonly) BOOL isModelClass;  //is model
 @property (assign , nonatomic,readonly) type_ typeCode;  //type int
 @property (assign , nonatomic) BOOL isMoresKeys;  //是否有多级映射

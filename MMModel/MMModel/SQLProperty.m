@@ -57,40 +57,21 @@ static inline type_ typeCode(const char *type){
         const char  *charType =  ivar_getTypeEncoding(ivar);
         //属性类型
         NSMutableString *type  = [NSMutableString  stringWithUTF8String:charType];
-        
         _type = [type mutableCopy];
-        
-        
-        
         //对象类型
         if ([type hasPrefix:@"@"]) {
             _type =  [type substringWithRange:NSMakeRange(2, type.length-3)];
-            
             _ClassType = NSClassFromString(_type);
-            
-            
-            _isModelClass = ![_ClassType isNoClass];
-            
-            
+           _isModelClass = ![_ClassType isNoClass];
+         
         }else{
             _typeCode = typeCode(charType);
-            
         }
         //属性名字
         NSMutableString *key  = [NSMutableString stringWithUTF8String:ivar_getName(ivar)];
         [key replaceCharactersInRange:NSMakeRange(0, 1) withString:@""];
         _propertyName = [key copy];
-        //get 方法
-        _getSel = NSSelectorFromString(_propertyName);
-      
-        
-        //处理set方法
-        NSString *cap = [key substringToIndex:1].uppercaseString;
-        [key replaceCharactersInRange:NSMakeRange(0, 1) withString:cap];
-        [key insertString:@"set" atIndex:0];
-        [key appendString:@":"];
-        _setSel = NSSelectorFromString(key);
-        
+ 
         
         
     }

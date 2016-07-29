@@ -12,6 +12,7 @@
     [self mm_ModelEncode:aCoder];\
 } 
 @protocol MMModelProtocol <NSObject>
+@optional
 /*以下方法都是在model 类内部调用*/
 /**处理替换的key  自定义属性名字*/
 +(NSDictionary *)mm_replacePropertyName;
@@ -25,7 +26,7 @@
 - (id)mm_newValueReplaceOldValueKey:(NSString *)property old:(id)oldValue;
 @end
 
-@interface NSObject (SQLExtension)
+@interface NSObject (SQLExtension) <MMModelProtocol>
 
 /**对象方法模型转字典*/
 -(void)mm_ModelWithDictJson:(id)dict;
