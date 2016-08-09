@@ -39,10 +39,10 @@ static  id  propertyKey(SQLProperty *property ,id dict){
 @interface SQClass : NSObject
 -(instancetype)initWithClass:(Class )c;
 @property (strong , nonatomic) NSDictionary *ClassInArrays;
-@property (strong , nonatomic) NSMutableDictionary *ClassMoresKeys;
-@property (strong , nonatomic) NSDictionary *ClassReplacePropertyNames;
 @property (strong , nonatomic) NSMutableArray <SQLProperty *>*propertys;
 @property (assign , nonatomic) BOOL isClassInArrays;
+@property (assign , nonatomic) BOOL isReplaceName;
+@property (assign , nonatomic) BOOL isReplaceMoreName;
 
 @end
 @implementation SQClass
@@ -65,22 +65,27 @@ static  id  propertyKey(SQLProperty *property ,id dict){
             self.ClassInArrays = classInArrays;
             self.isClassInArrays = YES;
         }
+       
+        
         //替换的key
+        NSDictionary *replaceNameDict = nil;
+        NSMutableDictionary *ClassMoresKeys = nil;
         if([c respondsToSelector:@selector(mm_replacePropertyName)]) {  //是否执行了
-            NSDictionary *replaceNameDict = [c mm_replacePropertyName]; //拿到字典
-            __block  NSMutableDictionary *moreDicts = [NSMutableDictionary new];
+            replaceNameDict = [c mm_replacePropertyName]; //拿到字典
+            ClassMoresKeys = [NSMutableDictionary new];
             [replaceNameDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop){
                 
                 if ([obj isKindOfClass:[NSString class]]) {
                     NSString *strObj = (NSString *)obj;
                     NSArray *comp = [strObj componentsSeparatedByString:@"."];
                     if (comp.count > 1) {
-                        moreDicts[key] = comp;
+                        ClassMoresKeys[key] = comp;
                     }
                 }
             }];
-            self.ClassReplacePropertyNames = replaceNameDict;
-            self.ClassMoresKeys = moreDicts;
+            
+            self.isReplaceName = YES;
+            self.isReplaceMoreName = ClassMoresKeys.count;
         }
         
         self.propertys = [NSMutableArray new];
@@ -94,16 +99,16 @@ static  id  propertyKey(SQLProperty *property ,id dict){
                 
                 if (whileList)if (![whileList containsObject:property.propertyName]) continue;
                 if (blackList)if ([blackList  containsObject:property.propertyName]) continue;
-                if (self.ClassReplacePropertyNames){
-                    NSString *replaceName =  self.ClassReplacePropertyNames[property.propertyName];
+                if (self.isReplaceName){
+                    NSString *replaceName =  replaceNameDict[property.propertyName];
                     if (replaceName) {
                         property.isReplaceKeys = YES;
                         property.PropertyReplaceName = replaceName;
                     }
                     
                 }
-                if (self.ClassMoresKeys){
-                    NSArray *moreKeys = self.ClassMoresKeys[property.propertyName];
+                if (self.isReplaceMoreName){
+                    NSArray *moreKeys = ClassMoresKeys[property.propertyName];
                     if (moreKeys) {
                         property.isMoresKeys = YES;
                         property.PropertyMoresKeys = moreKeys;
@@ -124,8 +129,6 @@ static  id  propertyKey(SQLProperty *property ,id dict){
             c = class_getSuperclass(c);
         }
         
-        if(!self.ClassMoresKeys) self.ClassMoresKeys = @{}.mutableCopy;
-        if(!self.ClassReplacePropertyNames) self.ClassReplacePropertyNames = @{};
         if(!self.ClassInArrays) self.ClassInArrays = @{};
         
     }
@@ -215,16 +218,18 @@ static  NSMutableArray *objecValuesFromArray(NSArray *array,Class cl){
 
 static  void objectValueFromJsonObject(id self,id dict){
      SQClass *ClassInfo = [self propertyClassInfo];
+     BOOL isNewValueReplaceOldNew = [self respondsToSelector:@selector(mm_newValueReplaceOldValueKey:old:)];
     for (SQLProperty *property in ClassInfo.propertys) {
         NSString *key = property.propertyName;
         Class classType  = property.ClassType;
         //取值
         id value = propertyKey(property,dict);
+        
         if (value == nil || value == [NSNull null]){
           continue;
         }
-        if ([self respondsToSelector:@selector(mm_newValueReplaceOldValueKey:old:)]) {
-           id  newValue = [self mm_newValueReplaceOldValueKey:property.propertyName old:value];
+        if (isNewValueReplaceOldNew) {
+          id  newValue = [self mm_newValueReplaceOldValueKey:property.propertyName old:value];
             if (newValue != value) {
                 [self setValue:newValue forKey:key];
                 continue;
@@ -274,7 +279,7 @@ static  void objectValueFromJsonObject(id self,id dict){
                         }
                     }else if (classType ==[NSArray class]||
                               classType==[NSMutableArray class]){
-                        Class  cl =  ClassInfo.ClassInArrays[key];
+                         Class  cl =  ClassInfo.ClassInArrays[key];
                         if (cl) {
                             NSMutableArray *classs = objecValuesFromArray(value,cl);
                             value = !classs ?value :classs;
@@ -290,7 +295,10 @@ static  void objectValueFromJsonObject(id self,id dict){
                     value = numberValueFromStringValue(value);
                 }else{
                     static NSNumberFormatter *numberFormatter =  nil;
-                    numberFormatter = [NSNumberFormatter new];
+                    static dispatch_once_t onceToken;
+                    dispatch_once(&onceToken, ^{
+                       numberFormatter = [NSNumberFormatter new];
+                    });
                     value =  [numberFormatter numberFromString:value];
                 }
             }
@@ -298,14 +306,12 @@ static  void objectValueFromJsonObject(id self,id dict){
         if (classType && ![value isKindOfClass:classType]) value = nil;
            [self setValue:value forKey:key];
       }
-  
 }
 
 -(void)objcKeyValue:(id)dict{
     NSAssert([[dict class] isSubclassOfClass:[NSDictionary class]], @"不是字典");
     if ([self isNoClass]) return;
-    @try {
-        objectValueFromJsonObject(self,dict);
+    @try { objectValueFromJsonObject(self,dict);
     } @catch (NSException *exception) {
         NSLog(@"MMModel   objcKeyValue  is  error %@",exception);
     }
