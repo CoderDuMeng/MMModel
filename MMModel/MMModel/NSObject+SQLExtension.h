@@ -1,29 +1,19 @@
 // iOS  杜蒙 
 
 #import <Foundation/Foundation.h> 
-#define MMCode \
--(instancetype)initWithCoder:(NSCoder *)aDecoder{\
-    if (self=[super init]) {\
-        [self mm_ModelDecode:aDecoder];\
-    }\
-    return self;\
-}\
--(void)encodeWithCoder:(NSCoder *)aCoder{\
-    [self mm_ModelEncode:aCoder];\
-} 
 @protocol MMModelProtocol <NSObject>
 @optional
 /*以下方法都是在model 类内部调用*/
 /**处理替换的key  自定义属性名字*/
-+(NSDictionary *)mm_replacePropertyName;
++(NSDictionary *)mm_ReplacePropertyName;
 /**自定义数组里面的key 对应那个类*/
-+(NSDictionary *)mm_propertyClassInArray;
++(NSDictionary *)mm_PropertyClassInArray;
 /**加白名单里面的属性是处理的没有加入的就是不处理的*/
-+(NSArray *)mm_whitePropertyList;
++(NSArray *)mm_WhitePropertyList;
 /**加入黑名单里面的属性是不用处理的没有加入的是处理的*/
-+(NSArray *)mm_blackPropertyList;
++(NSArray *)mm_BlackPropertyList;
 //新值替换旧值
-- (id)mm_newValueReplaceOldValueKey:(NSString *)property old:(id)oldValue;
+- (id)mm_NewValueReplaceOldValueKey:(NSString *)property old:(id)oldValue;
 @end
 
 @interface NSObject (SQLExtension) <MMModelProtocol>
@@ -38,7 +28,7 @@
 /**传入NSData 类型的json*/
 +(instancetype)mm_ModelObjectWithValueData:(NSData *)json;
 /**模型类 转字典*/
--(NSMutableDictionary *)mm_jsonWithModelObject;
+-(NSMutableDictionary *)mm_JsonWithModelObject;
 //编码
 - (void)mm_ModelEncode:(NSCoder *)encode;
 //解码
@@ -48,4 +38,13 @@
 - (BOOL)isNoClass;
 
 @end
-
+#define MMCode \
+-(instancetype)initWithCoder:(NSCoder *)aDecoder{\
+if (self=[super init]) {\
+[self mm_ModelDecode:aDecoder];\
+}\
+return self;\
+}\
+-(void)encodeWithCoder:(NSCoder *)aCoder{\
+[self mm_ModelEncode:aCoder];\
+}

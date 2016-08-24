@@ -59,7 +59,7 @@
     NSLog(@"age:%zi  name:%@ source:%@ prcie:%2f is:%zi",model.age,model.name,model.source,model.price,model.is);
     
     
-    NSLog(@"json -> model  %@",model.mm_jsonWithModelObject);
+    NSLog(@"json -> model  %@",model.mm_JsonWithModelObject);
     
 }
 
@@ -99,7 +99,7 @@
     
     NSLog(@"name:%@  dict:%@",model.name,model.dict);
     
-    NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
+    NSLog(@"json->model:%@",model.mm_JsonWithModelObject);
     
    
     
@@ -133,7 +133,7 @@
     NSLog(@"%zi  %@",model.json.age, model.json1.name);
 
     
-    NSLog(@"json->model:%@",model.mm_jsonWithModelObject);
+    NSLog(@"json->model:%@",model.mm_JsonWithModelObject);
     
   
     
@@ -175,7 +175,7 @@
     
     NSLog(@"models:%@",model.models);
     
-    NSLog(@"json: %@",model.mm_jsonWithModelObject);
+    NSLog(@"json: %@",model.mm_JsonWithModelObject);
     
    
 }
@@ -203,7 +203,7 @@
      */
     blackModel *model = [blackModel mm_ModelObjectWithDictJson:json];
     
-    NSLog(@"blackJson:%@",model.mm_jsonWithModelObject);
+    NSLog(@"blackJson:%@",model.mm_JsonWithModelObject);
     
     
     
@@ -231,7 +231,7 @@
     
     whiteModel *model = [whiteModel mm_ModelObjectWithDictJson:json];
     
-    NSLog(@"whiteJson:%@",model.mm_jsonWithModelObject);
+    NSLog(@"whiteJson:%@",model.mm_JsonWithModelObject);
   
     
 }

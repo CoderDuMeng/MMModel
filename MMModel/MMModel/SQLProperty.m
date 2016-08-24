@@ -50,30 +50,29 @@ static inline type_ typeCode(const char *type){
 
 @implementation SQLProperty
 
-
 -(instancetype)initWithIvar:(Ivar)ivar class:(__unsafe_unretained Class)c{
     if (self= [super init]) {
-        _modelClass = c;
+        _ModelClass = c;
         const char  *charType =  ivar_getTypeEncoding(ivar);
         //属性类型
         NSMutableString *type  = [NSMutableString  stringWithUTF8String:charType];
-        _type = [type mutableCopy];
+        _Type = [type mutableCopy];
         //对象类型
         if ([type hasPrefix:@"@"]) {
-            _type =  [type substringWithRange:NSMakeRange(2, type.length-3)];
-            _ClassType = NSClassFromString(_type);
+            _Type =  [type substringWithRange:NSMakeRange(2, type.length-3)];
+            _ClassType = NSClassFromString(_Type);
            _isModelClass = ![_ClassType isNoClass];
          
         }else{
-            _typeCode = typeCode(charType);
+            _TypeCode = typeCode(charType);
         }
         //属性名字
         NSMutableString *key  = [NSMutableString stringWithUTF8String:ivar_getName(ivar)];
         [key replaceCharactersInRange:NSMakeRange(0, 1) withString:@""];
-        _propertyName = [key copy];
- 
+        _PropertyName = [key copy];
         
-        
+    
+   
     }
     return self;
 }
