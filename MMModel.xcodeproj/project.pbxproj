@@ -14,9 +14,9 @@
 		C534EDB41D45D744006B92CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C534EDB31D45D744006B92CA /* Assets.xcassets */; };
 		C534EDB71D45D744006B92CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C534EDB51D45D744006B92CA /* LaunchScreen.storyboard */; };
 		C534EDC41D45D755006B92CA /* NSObject+SQLExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */; };
-		C534EDC51D45D755006B92CA /* SQLProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC31D45D755006B92CA /* SQLProperty.m */; };
 		C534EDC81D45D760006B92CA /* jsonModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDC71D45D760006B92CA /* jsonModel.m */; };
 		C534EDCB1D45E5A9006B92CA /* mappingModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C534EDCA1D45E5A9006B92CA /* mappingModel.m */; };
+		C5DFB1231D76713B00E193EA /* SQLPropertyType.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DFB1221D76713B00E193EA /* SQLPropertyType.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,12 +33,12 @@
 		C534EDBF1D45D755006B92CA /* MMModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMModel.h; sourceTree = "<group>"; };
 		C534EDC01D45D755006B92CA /* NSObject+SQLExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SQLExtension.h"; sourceTree = "<group>"; };
 		C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SQLExtension.m"; sourceTree = "<group>"; };
-		C534EDC21D45D755006B92CA /* SQLProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLProperty.h; sourceTree = "<group>"; };
-		C534EDC31D45D755006B92CA /* SQLProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLProperty.m; sourceTree = "<group>"; };
 		C534EDC61D45D760006B92CA /* jsonModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsonModel.h; sourceTree = "<group>"; };
 		C534EDC71D45D760006B92CA /* jsonModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = jsonModel.m; sourceTree = "<group>"; };
 		C534EDC91D45E5A9006B92CA /* mappingModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mappingModel.h; sourceTree = "<group>"; };
 		C534EDCA1D45E5A9006B92CA /* mappingModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mappingModel.m; sourceTree = "<group>"; };
+		C5DFB1211D76713B00E193EA /* SQLPropertyType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SQLPropertyType.h; sourceTree = "<group>"; };
+		C5DFB1221D76713B00E193EA /* SQLPropertyType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLPropertyType.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,8 +103,8 @@
 				C534EDBF1D45D755006B92CA /* MMModel.h */,
 				C534EDC01D45D755006B92CA /* NSObject+SQLExtension.h */,
 				C534EDC11D45D755006B92CA /* NSObject+SQLExtension.m */,
-				C534EDC21D45D755006B92CA /* SQLProperty.h */,
-				C534EDC31D45D755006B92CA /* SQLProperty.m */,
+				C5DFB1211D76713B00E193EA /* SQLPropertyType.h */,
+				C5DFB1221D76713B00E193EA /* SQLPropertyType.m */,
 			);
 			path = MMModel;
 			sourceTree = "<group>";
@@ -183,10 +183,10 @@
 				C534EDAF1D45D744006B92CA /* ViewController.m in Sources */,
 				C534EDC81D45D760006B92CA /* jsonModel.m in Sources */,
 				C534EDAC1D45D744006B92CA /* AppDelegate.m in Sources */,
+				C5DFB1231D76713B00E193EA /* SQLPropertyType.m in Sources */,
 				C534EDC41D45D755006B92CA /* NSObject+SQLExtension.m in Sources */,
 				C534EDCB1D45E5A9006B92CA /* mappingModel.m in Sources */,
 				C534EDA91D45D744006B92CA /* main.m in Sources */,
-				C534EDC51D45D755006B92CA /* SQLProperty.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,6 +337,7 @@
 				C534EDBD1D45D744006B92CA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

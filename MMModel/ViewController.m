@@ -7,12 +7,7 @@
 //
 
 #import "ViewController.h"
-
-#import "MMModel.h" 
-
-
-
-
+#import "MMModel.h"
 #import "jsonModel.h"
 #import "mappingModel.h"
 @interface ViewController ()
@@ -24,7 +19,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+    /*
+      1.性能大家可以对比github 上的 YYModel MJExtension JSONModel  mantle  等等诸多框架   
+       谢谢大家 
+     */
     [self modelWithJson];  //<< 简单的json转模型
     [self Multistagemapping]; // <<多级映射取值
     [self objectisProertyName]; //<<模型类型作为属性
@@ -53,13 +51,13 @@
     
     
     
-    jsonModel *model = [jsonModel mm_ModelObjectWithDictJson:json];
+    jsonModel *model = [jsonModel mm_ModelObjectWithJSON:json];
     
     
     NSLog(@"age:%zi  name:%@ source:%@ prcie:%2f is:%zi",model.age,model.name,model.source,model.price,model.is);
     
     
-    NSLog(@"json -> model  %@",model.mm_JsonWithModelObject);
+    NSLog(@"json -> model  %@",model.mm_JSONWithModel);
     
 }
 
@@ -94,12 +92,12 @@
      
     }
      */
-    mappingModel *model = [mappingModel mm_ModelObjectWithDictJson:json];
+    mappingModel *model = [mappingModel mm_ModelObjectWithJSON:json];
     
     
     NSLog(@"name:%@  dict:%@",model.name,model.dict);
     
-    NSLog(@"json->model:%@",model.mm_JsonWithModelObject);
+    NSLog(@"json->model:%@",model.mm_JSONWithModel);
     
    
     
@@ -128,12 +126,12 @@
                                        }
                            };
     //模型作为属性
-    ObjectModel *model = [ObjectModel mm_ModelObjectWithDictJson:json];
+    ObjectModel *model = [ObjectModel mm_ModelObjectWithJSON:json];
     
     NSLog(@"%zi  %@",model.json.age, model.json1.name);
 
     
-    NSLog(@"json->model:%@",model.mm_JsonWithModelObject);
+    NSLog(@"json->model:%@",model.mm_JSONWithModel);
     
   
     
@@ -171,11 +169,11 @@
     
     
     
-    arrayPropertyModel *model = [arrayPropertyModel mm_ModelObjectWithDictJson:json];
+    arrayPropertyModel *model = [arrayPropertyModel mm_ModelObjectWithJSON:json];
     
     NSLog(@"models:%@",model.models);
     
-    NSLog(@"json: %@",model.mm_JsonWithModelObject);
+    NSLog(@"json: %@",model.mm_JSONWithModel);
     
    
 }
@@ -201,9 +199,9 @@
      
      }
      */
-    blackModel *model = [blackModel mm_ModelObjectWithDictJson:json];
+    blackModel *model = [blackModel mm_ModelObjectWithJSON:json];
     
-    NSLog(@"blackJson:%@",model.mm_JsonWithModelObject);
+    NSLog(@"blackJson:%@",model.mm_JSONWithModel);
     
     
     
@@ -229,9 +227,9 @@
      
      */
     
-    whiteModel *model = [whiteModel mm_ModelObjectWithDictJson:json];
+    whiteModel *model = [whiteModel mm_ModelObjectWithJSON:json];
     
-    NSLog(@"whiteJson:%@",model.mm_JsonWithModelObject);
+    NSLog(@"whiteJson:%@",model.mm_JSONWithModel);
   
     
 }

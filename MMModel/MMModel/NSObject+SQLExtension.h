@@ -1,6 +1,6 @@
-// iOS  杜蒙 
+// iOS  杜蒙
 
-#import <Foundation/Foundation.h> 
+#import <Foundation/Foundation.h>
 @protocol MMModelProtocol <NSObject>
 @optional
 /*以下方法都是在model 类内部调用*/
@@ -17,25 +17,24 @@
 @end
 
 @interface NSObject (SQLExtension) <MMModelProtocol>
-
-/**对象方法模型转字典*/
--(void)mm_ModelWithDictJson:(id)dict;
-
 /**字典转模型*/
-+(instancetype)mm_ModelObjectWithDictJson:(id)dict;
++(instancetype)mm_ModelObjectWithJSON:(id)json;
 /**传入NSString 类型的json*/
-+(instancetype)mm_ModelObjectWithValueString:(NSString *)json;
++(instancetype)mm_ModelObjectWithStringJSON:(NSString *)json;
 /**传入NSData 类型的json*/
-+(instancetype)mm_ModelObjectWithValueData:(NSData *)json;
++(instancetype)mm_ModelObjectWithDataJSON:(NSData *)json;
 /**模型类 转字典*/
--(NSMutableDictionary *)mm_JsonWithModelObject;
+-(id)mm_JSONWithModel;
+/*模型类  转String json*/
+-(NSString *)mm_JSONStringWithModel;
+/*模型类  转Data  json*/
+-(NSData *)mm_JSONDataWithModel;
+
 //编码
 - (void)mm_ModelEncode:(NSCoder *)encode;
 //解码
 - (void)mm_ModelDecode:(NSCoder *)decode;
 
-/**检测是不是model类型 除Foundation框架的类型  no is model  yser is Foundation*/
-- (BOOL)isNoClass;
 
 @end
 #define MMCode \
