@@ -10,6 +10,8 @@
 
 @interface mappingModel : NSObject
 @property (strong , nonatomic) NSString *name;
+@property (strong , nonatomic) NSString *name1;
+@property (strong , nonatomic) NSString *name2;
 @property (strong , nonatomic) NSDictionary *dict;
 @end
 

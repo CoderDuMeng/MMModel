@@ -13,21 +13,12 @@
 @interface SQPropertyMeta : NSObject
 {
     @package
-    Class      _ClassType;   //<<来自那个类
-    BOOL      _isFoundation; //model Class
-    BOOL      _isMoresKeys;  //是否有多级映射
-    BOOL      _isReplaceKeys; //是否有替换的key
-    NSString  *_PropertyName;  //property name
-    NSString  *_PropertyReplaceName;  //替换key
-    NSArray   *_PropertyMoresKeys;    //多级映射
-    type_     _TypeCode;  //type int
-    typeFoundation_     _TypeFoundation;  //type int
-    SEL       _setSelecor; //<<set 方法
-    Class     _ModelClass; // Class 类型
-    Class     _MappingClass;
-    
-    
-    
+    Class      _ClassType;
+    BOOL       _isFoundation;
+    NSString   *_PropertyName;
+    type_      _TypeCode;
+    typeFoundation_  _TypeFoundation;
+    SEL        _setSelecor;
 }
 
 -(instancetype)initWithIvar:(Ivar )ivar class:(Class )c;
@@ -35,7 +26,6 @@
 @implementation SQPropertyMeta
 -(instancetype)initWithIvar:(Ivar)ivar class:(__unsafe_unretained Class)c{
     if (self= [super init]) {
-        self->_ModelClass = c;
         const char  *charType =  ivar_getTypeEncoding(ivar);
         //属性类型
         NSMutableString *type  = [NSMutableString  stringWithUTF8String:charType];
@@ -61,22 +51,67 @@
         self->_setSelecor = NSSelectorFromString(set);
         
         
-        
     }
     return self;
 }
 
 @end
-@interface SQClassMeta : NSObject
 
+
+@interface SQPropertyMetaInfo : NSObject
 {
     @package
-    NSDictionary *_ClassInArrays;
-    NSMutableArray <SQPropertyMeta *>*_Propertys;
-    NSMutableArray <SQPropertyMeta *>*_MappingMorePropertys;
-    NSMutableArray <SQPropertyMeta *>*_MappingPropertys;
-    NSMutableArray <NSString*>*_PropertyNames;
-    BOOL _isClassInArrays;
+    SEL _set;  //<< set 方法
+    NSString *_name; //<< 属性名字
+    NSString *_replaceName;//<< 替换的属性名字
+    NSArray  *_replaceMoreNames;//<<多级映射的keys
+    type_ _numberType;//<<基本数据类型
+    typeFoundation_ _isNSType; //<<NS 系列的对象类型
+    Class _mappingInArray;//<< 内映射Class
+    Class _propertyClass;//<< 属性是对象类型
+    BOOL  _isNS;//<<是否是对象
+    
+}
+-(instancetype)initWithMetaInfoIvar:(Ivar)ivar Class:(Class )c;
+@end
+@implementation SQPropertyMetaInfo
+-(instancetype)initWithMetaInfoIvar:(Ivar)ivar Class:(Class )c{
+    if (self=[super init]) {
+        SQPropertyMeta *meta = [[SQPropertyMeta alloc] initWithIvar:ivar class:c];
+        self->_name = meta->_PropertyName;
+        self->_numberType = meta->_TypeCode;
+        self->_isNSType   = meta->_TypeFoundation;
+        Class cl          = meta->_ClassType;
+        if (cl) {
+            self->_propertyClass = cl;
+            self->_isNS = YES;
+        }
+        self->_set = meta->_setSelecor;
+    }
+    return self;
+}
+@end
+@interface SQClassMeta : NSObject
+{
+    @package
+    /*
+     调用此方法返回的映射数组里面的映射成那个类型 (或者是字典里面的key 也是字典的时候)
+     +(NSDictionary <NSString *, Class>*)mm_PropertyClassInArray{
+     
+     return @{
+     @"key" :[NSObject class]
+     
+     };
+     }
+     */
+    NSDictionary   <NSString *,Class >*_ClassInArrays;
+    NSMutableArray <NSString*>*_PropertyNames;//<<属性的名字
+    NSMutableArray <SQPropertyMetaInfo *>*_PropertyMetas;//<<没有参与替换属性名字
+    NSMutableArray <SQPropertyMetaInfo *>*_MappingMorePropertyMetas; //<< 参与多级映射
+    NSMutableArray <SQPropertyMetaInfo *>*_MappingPropertyMetas; //<<参与替换属性名字
+    
+    BOOL _isNewValueReplaceOldValue; //<< 是否执行了新值替换旧值
+    
 }
 -(instancetype)initWithClass:(Class )c;
 +(instancetype)initWithMetaClass:(Class )c;
@@ -88,24 +123,33 @@
         //黑名单
         NSArray *blackList = nil;
         if ([c respondsToSelector:@selector(mm_BlackPropertyList)]) {
-            blackList = [c mm_BlackPropertyList];
+            NSArray *blackLists = [c mm_BlackPropertyList];
+            if (blackLists) {
+                blackList = blackLists;
+            }
         }
         //白名单
         NSArray *whileList = nil;
         if ([c respondsToSelector:@selector(mm_WhitePropertyList)]) {
-            whileList = [c mm_WhitePropertyList];
+            NSArray *whileLists = [c mm_WhitePropertyList];
+            if (whileLists) {
+                whileList = whileLists;
+            }
         }
         //Class inArray
         //处理替换array
         if ([c respondsToSelector:@selector(mm_PropertyClassInArray)]) {
             NSDictionary *classInArrays  = [c mm_PropertyClassInArray];
-            _ClassInArrays = classInArrays;
-            self->_isClassInArrays = YES;
+            if (classInArrays) {
+                _ClassInArrays = classInArrays;
+            }
         }
+        self->_isNewValueReplaceOldValue = [c instancesRespondToSelector:@selector(mm_NewValueReplaceOldValueKey:old:)];
+        
         //替换的key
         NSDictionary *replaceNameDict = nil;
         NSMutableDictionary *ClassMoresKeys = nil;
-        BOOL _isReplaceName , _isReplaceMoreName;
+        BOOL _isReplaceName = NO , _isReplaceMoreName = NO;
         if([c respondsToSelector:@selector(mm_ReplacePropertyName)]) {  //是否执行了
             replaceNameDict = [c mm_ReplacePropertyName]; //拿到字典
             ClassMoresKeys = [NSMutableDictionary new];
@@ -118,68 +162,65 @@
                     }
                 }
             }];
-            
-            _isReplaceName = YES;
-            self->_MappingPropertys = [NSMutableArray new];
-            _isReplaceMoreName = ClassMoresKeys.count;
-            if (_isReplaceMoreName) {
-                self->_MappingMorePropertys = [NSMutableArray new];
+            if (replaceNameDict) {
+                _isReplaceName = YES;
+                self->_MappingPropertyMetas = [NSMutableArray new];
+                _isReplaceMoreName = ClassMoresKeys.count;
+                if (_isReplaceMoreName) {
+                    self->_MappingMorePropertyMetas = [NSMutableArray new];
+                }
             }
             
-            
         }
-        self->_Propertys = [NSMutableArray new];
         self->_PropertyNames = [NSMutableArray new];
-        void (^block)(Class c) = ^(Class c){
+        self->_PropertyMetas = [NSMutableArray new];
+        while (c) {
+            if (c == [NSObject class]) break;
             unsigned int ivarCount = 0;
             Ivar *ivars = class_copyIvarList(c, &ivarCount);
             for (int i = 0 ; i < ivarCount; i++) {
                 Ivar ivar = ivars[i];
-                SQPropertyMeta * meta = [[SQPropertyMeta alloc] initWithIvar:ivar class:c];
-                if (whileList)if (![whileList containsObject:meta->_PropertyName]) continue;
-                if (blackList)if ([blackList  containsObject:meta->_PropertyName]) continue;
-                NSString *name = meta->_PropertyName;
+                SQPropertyMetaInfo * meta = [[SQPropertyMetaInfo alloc] initWithMetaInfoIvar:ivar Class:c];
+                NSString *name = meta->_name;
+                if (whileList)if (![whileList containsObject:name]) continue;
+                if (blackList)if ([blackList  containsObject:name]) continue;
                 [self->_PropertyNames addObject:name];
-                if (self->_isClassInArrays) {
+                if (self->_ClassInArrays) {
                     Class mappingClass = self->_ClassInArrays[name];
                     if (mappingClass) {
-                        meta->_MappingClass = mappingClass;
-                        
+                        meta->_mappingInArray = mappingClass;
                     }
                 }
+                BOOL _isReplace = NO , _isReplaceMore = NO;
                 if (_isReplaceMoreName){
                     NSArray *moreKeys = ClassMoresKeys[name];
                     if (moreKeys) {
-                        meta->_isMoresKeys = YES;
-                        meta->_PropertyMoresKeys = moreKeys;
-                        [self->_MappingMorePropertys addObject:meta];
+                        _isReplaceMore = YES;
+                        meta->_replaceMoreNames = moreKeys;
+                        [self->_MappingMorePropertyMetas addObject:meta];
+                        continue;
                     }
                 }
                 if (_isReplaceName){
                     NSString *replaceName =  replaceNameDict[name];
-                    if (replaceName && meta->_isMoresKeys == NO) {
-                        meta->_isReplaceKeys = YES;
-                        meta->_PropertyReplaceName = replaceName;
-                        [self->_MappingPropertys addObject:meta];
+                    if (replaceName && _isReplaceMore == NO) {
+                        _isReplace = YES;
+                        meta->_replaceName = replaceName;
+                        [self->_MappingPropertyMetas addObject:meta];
+                        continue;
                     }
-                    
                 }
-                if (!meta->_isMoresKeys  && !meta->_isReplaceKeys) {
+                if (!_isReplaceMore  && !_isReplace) {
+                    [self->_PropertyMetas addObject:meta];
                     
-                    [self->_Propertys addObject:meta];
                 }
             }
             free(ivars);
-        };
-        
-        while (c != nil) {
-            if (c == [NSObject class]) break;
-            if (block) {
-                block(c);
-            }
             c = class_getSuperclass(c);
+            
         }
     }
+    
     return self;
     
 }
@@ -232,14 +273,14 @@ static  NSMutableArray *ArrayJSONObjectToModel(NSArray *array,Class cl){
     }
     return models.count ? models : nil;
 }
-static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta , BOOL isNewOld){
+static void ModelValueMappingJSONObject(id self, id value , SQPropertyMetaInfo *meta , BOOL isNewOld){
     @try {
-        id key  = meta->_PropertyName;
+        id key  = meta->_name;
         if (isNewOld) {
             id  newValue = [self mm_NewValueReplaceOldValueKey:key old:value];
             if (newValue==nil) return;
             if (newValue != value) {
-                ((void(*)(id ,SEL ,id))(void *)objc_msgSend)(self,meta->_setSelecor,newValue);
+                ((void(*)(id ,SEL ,id))(void *)objc_msgSend)(self,meta->_set,newValue);
                 return;
             }
         }
@@ -248,9 +289,9 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
         dispatch_once(&onceToken, ^{
             numberFormatter = [NSNumberFormatter new];
         });
-        if (!meta->_isFoundation) {
+        if (!meta->_isNS) {
             if ([value isKindOfClass:[NSString class]]) {
-                switch (meta->_TypeCode) {
+                switch (meta->_numberType) {
                     case _typeBool:
                     case _typebool:
                     case _typeInt:{
@@ -263,8 +304,8 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
             }
             [self setValue:value forKey:key];
             return;
-        }else{
-            switch (meta->_TypeFoundation) {
+        }else {
+            switch (meta->_isNSType) {
                 case _typeNSString:
                 case _typeNSMutableString:{
                     if ([value isKindOfClass:[NSURL class]]) {
@@ -282,7 +323,7 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 }break;
                 case _typeNSDictionary:
                 case _typeNSMutableDictionary:{
-                    Class cl = meta->_MappingClass;
+                    Class cl = meta->_mappingInArray;
                     if (!cl) break;
                     if ([value isKindOfClass:[NSDictionary class]]){
                         NSMutableDictionary *superDict = [NSMutableDictionary new];
@@ -299,7 +340,7 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 }break;
                 case _typeNSArray:
                 case _typeNSMutableArray:{
-                    Class cl = meta->_MappingClass;
+                    Class cl = meta->_mappingInArray;
                     if (!cl) break;
                     if ([value isKindOfClass:[NSArray class]]) {
                         NSMutableArray *classs = ArrayJSONObjectToModel(value,cl);
@@ -308,7 +349,7 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 }break;
                 case _typeObject:{
                     if ([value isKindOfClass:[NSDictionary  class]]) {
-                        id obj = [meta->_ClassType new];
+                        id obj = [meta->_propertyClass new];
                         [obj mm_ModelWithDictJSON:value];
                         value = obj;
                     }
@@ -317,7 +358,7 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 case _typeNSMutableData:{
                     if ([value isKindOfClass:[NSString class]]) {
                         value = [(NSString *)value dataUsingEncoding:NSUTF8StringEncoding];
-                        if (meta->_TypeFoundation == _typeNSMutableData) {
+                        if (meta->_isNSType == _typeNSMutableData) {
                             value  = [value mutableCopy];
                         }
                     }
@@ -325,9 +366,9 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 case _typeNSNumber:
                 case _typeNSDecimalNumber:{
                     if ([value isKindOfClass:[NSString class]]) {
-                        if (meta->_TypeFoundation == _typeNSNumber) {
+                        if (meta->_isNSType == _typeNSNumber) {
                             value =  [numberFormatter numberFromString:value];
-                        }else if (meta->_TypeFoundation == _typeNSDecimalNumber){
+                        }else if (meta->_isNSType == _typeNSDecimalNumber){
                             value = [NSDecimalNumber decimalNumberWithString:value];
                         }
                     }
@@ -335,14 +376,10 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMeta *meta
                 default:
                     break;
             }
+            
         }
-        
-        Class classType  = meta->_ClassType;
-        
-        if (classType && ![value isKindOfClass:classType]) return;
-        
-        ((void(*)(id ,SEL ,id))(void *)objc_msgSend)(self,meta->_setSelecor,value);
-        
+        if (![value isKindOfClass:meta->_propertyClass]) return;
+        ((void(*)(id ,SEL ,id))(void *)objc_msgSend)(self,meta->_set,value);
     } @catch (NSException *exception) {}
     
 }
@@ -350,21 +387,19 @@ static  void  ModelValueWithJSONObject(id self,id dict){
     @autoreleasepool {
         if (!dict) return;
         SQClassMeta *ClassMeta = [SQClassMeta  initWithMetaClass:object_getClass(self)];
-        BOOL isNewValueReplaceOldNew = [self respondsToSelector:@selector(mm_NewValueReplaceOldValueKey:old:)];
-        for (SQPropertyMeta *meta in ClassMeta->_MappingPropertys) {
-            id value = dict[meta->_PropertyReplaceName];
+        BOOL isNewValueReplaceOldNew = ClassMeta->_isNewValueReplaceOldValue;
+        for (SQPropertyMetaInfo *meta in ClassMeta->_MappingPropertyMetas) {
+            id value = dict[meta->_replaceName];
             if (value == nil || value == [NSNull null])continue;
             ModelValueMappingJSONObject(self , value , meta,isNewValueReplaceOldNew);
-        }
-        for (SQPropertyMeta *meta in ClassMeta->_Propertys) {
-            id value = dict[meta->_PropertyName];
+        }for (SQPropertyMetaInfo *meta in ClassMeta->_PropertyMetas) {
+            id value = dict[meta->_name];
             if (value == nil || value == [NSNull null])continue;
             ModelValueMappingJSONObject(self , value , meta,isNewValueReplaceOldNew);
-        }
-        for (SQPropertyMeta *meta in ClassMeta->_MappingMorePropertys) {
+        }for (SQPropertyMetaInfo *meta in ClassMeta->_MappingMorePropertyMetas) {
             id value = nil;
             id newObjectDict = [dict mutableCopy];
-            for (NSString *countsKey in meta->_PropertyMoresKeys) {
+            for (NSString *countsKey in meta->_replaceMoreNames) {
                 if (![newObjectDict isKindOfClass:[NSDictionary class]]) {
                     value = newObjectDict;
                 }else{
@@ -377,7 +412,9 @@ static  void  ModelValueWithJSONObject(id self,id dict){
             }
             if (value == nil || value == [NSNull null])continue;
             ModelValueMappingJSONObject(self ,value ,meta,isNewValueReplaceOldNew);
+            
         }
+        
     }
 }
 
@@ -388,12 +425,11 @@ static  NSMutableArray *ArrayObjectToJSONObject(NSArray *objs){
         id dict = [model mm_JSONWithModel];
         [jsons addObject:dict];
     }
-    
     return jsons.count ? jsons : nil;
 }
 
-static id JSONValueToModelProperty(SQPropertyMeta *meta , id value){
-    switch (meta->_TypeFoundation) {
+static id JSONValueToModelProperty(SQPropertyMetaInfo *meta , id value){
+    switch (meta->_isNSType) {
         case _typeObject:{
             value= JSONObjectMappingModelObject(value);
         }break;
@@ -431,26 +467,22 @@ static id JSONObjectMappingModelObject(id self){
         @autoreleasepool {
             NSMutableDictionary *dict = [NSMutableDictionary new];
             SQClassMeta *ClassMeta = [SQClassMeta initWithMetaClass:object_getClass(self)];
-            for (SQPropertyMeta *meta in ClassMeta->_MappingPropertys) {
-                NSString *key = meta->_PropertyName;
-                id value = [self valueForKey:key];
+            for (SQPropertyMetaInfo *meta in ClassMeta->_MappingPropertyMetas) {
+                id value = [self valueForKey:meta->_name];
                 if (value == nil || value == [NSNull null])continue;
                 id  NewValue = JSONValueToModelProperty(meta , value);
-                dict[meta->_PropertyReplaceName] = NewValue;
-            }
-            for (SQPropertyMeta *meta in ClassMeta->_Propertys) {
-                NSString *key = meta->_PropertyName;
-                id value = [self valueForKey:key];
+                dict[meta->_replaceName] = NewValue;
+            }for (SQPropertyMetaInfo *meta in ClassMeta->_PropertyMetas) {
+                id value = [self valueForKey:meta->_name];
                 if (value == nil || value == [NSNull null])continue;
                 id  NewValue = JSONValueToModelProperty(meta , value);
-                dict[meta->_PropertyName] = NewValue;
-            }
-            for (SQPropertyMeta *meta in ClassMeta->_MappingMorePropertys) {
-                NSString *key = meta->_PropertyName;
-                id value = [self valueForKey:key];
+                dict[meta->_name] = NewValue;
+            }for (SQPropertyMetaInfo *meta in ClassMeta->_MappingMorePropertyMetas) {
+                id value = [self valueForKey:meta->_name];
                 if (value == nil || value == [NSNull null])continue;
+                
                 id  NewValue = JSONValueToModelProperty(meta , value);
-                NSArray * moresComp = meta->_PropertyMoresKeys;
+                NSArray * moresComp = meta->_replaceMoreNames;
                 if (moresComp) {
                     NSMutableDictionary *values = dict;
                     for (int i = 0, over = (int)moresComp.count; i < over; i++) {
@@ -474,8 +506,8 @@ static id JSONObjectMappingModelObject(id self){
                         }
                     }
                 }
+                
             }
-            
             return dict;
         }
         

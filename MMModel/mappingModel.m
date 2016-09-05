@@ -13,6 +13,8 @@ MMCode
 +(NSDictionary *)mm_ReplacePropertyName{
     return @{
              @"name" :@"json.name",
+             @"name1":@"json.name",
+             @"name2":@"json.name",
              @"dict" :@"json.dict"
              
              };

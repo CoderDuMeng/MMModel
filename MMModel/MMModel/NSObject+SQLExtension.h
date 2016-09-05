@@ -5,13 +5,13 @@
 @optional
 /*以下方法都是在model 类内部调用*/
 /**处理替换的key  自定义属性名字*/
-+(NSDictionary *)mm_ReplacePropertyName;
++(NSDictionary <NSString *, NSString *> *)mm_ReplacePropertyName;
 /**自定义数组里面的key 对应那个类*/
-+(NSDictionary *)mm_PropertyClassInArray;
++(NSDictionary <NSString *, Class>*)mm_PropertyClassInArray;
 /**加白名单里面的属性是处理的没有加入的就是不处理的*/
-+(NSArray *)mm_WhitePropertyList;
++(NSArray <NSString *>*)mm_WhitePropertyList;
 /**加入黑名单里面的属性是不用处理的没有加入的是处理的*/
-+(NSArray *)mm_BlackPropertyList;
++(NSArray <NSString *> *)mm_BlackPropertyList;
 //新值替换旧值
 - (id)mm_NewValueReplaceOldValueKey:(NSString *)property old:(id)oldValue;
 @end
