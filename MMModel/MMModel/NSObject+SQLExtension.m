@@ -9,7 +9,6 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-
 @interface SQPropertyMeta : NSObject
 {
     @package
@@ -70,7 +69,6 @@
     Class _mappingInArray;//<< 内映射Class
     Class _propertyClass;//<< 属性是对象类型
     BOOL  _isNS;//<<是否是对象
-    
 }
 -(instancetype)initWithMetaInfoIvar:(Ivar)ivar Class:(Class )c;
 @end
@@ -86,7 +84,12 @@
             self->_propertyClass = cl;
             self->_isNS = YES;
         }
-        self->_set = meta->_setSelecor;
+        SEL set_ = meta->_setSelecor;
+        if ([c instancesRespondToSelector:set_]) {
+            self->_set = set_;
+        }else{
+            return nil;
+        }
     }
     return self;
 }
@@ -181,6 +184,7 @@
             for (int i = 0 ; i < ivarCount; i++) {
                 Ivar ivar = ivars[i];
                 SQPropertyMetaInfo * meta = [[SQPropertyMetaInfo alloc] initWithMetaInfoIvar:ivar Class:c];
+                if (meta == nil) continue;
                 NSString *name = meta->_name;
                 if (whileList)if (![whileList containsObject:name]) continue;
                 if (blackList)if ([blackList  containsObject:name]) continue;
@@ -317,6 +321,7 @@ static void ModelValueMappingJSONObject(id self, id value , SQPropertyMetaInfo *
                     }
                 }break;
                 case _typeNSURL:{
+                    if ([value isKindOfClass:[NSURL class]])break;
                     if ([value isKindOfClass:[NSString class]]) {
                         value = [NSURL URLWithString:value];
                     }
@@ -436,8 +441,12 @@ static id JSONValueToModelProperty(SQPropertyMetaInfo *meta , id value){
         case _typeNSDate:{
             value = ((NSDate *)value).description;
         }break;
+        case _typeNSURL:{
+            value = ((NSURL *)value).absoluteString;
+        }break;
         case _typeNSDictionary:
         case _typeNSMutableDictionary:{
+            if (!meta->_mappingInArray)break;
             value = [NSMutableDictionary dictionaryWithDictionary:value];
             NSMutableDictionary *superDict = [NSMutableDictionary new];
             [(NSMutableDictionary *)value enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
@@ -452,6 +461,7 @@ static id JSONValueToModelProperty(SQPropertyMetaInfo *meta , id value){
         }break;
         case _typeNSArray:
         case _typeNSMutableArray:{
+            if (!meta->_mappingInArray)break;
             NSMutableArray *models = ArrayObjectToJSONObject(value);
             value = models ? models : value;
         }
