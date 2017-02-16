@@ -2,7 +2,7 @@
 #import "SQLPropertyType.h"
 #import "NSObject+SQLExtension.h"
 type_ PropertyNumberType(const char *type){
-    type_ t;
+    type_ t = _typeNone;
      switch (*type) {
         case 'i':
             t = _typeInt;

@@ -195,11 +195,9 @@
                         meta->_mappingInArray = mappingClass;
                     }
                 }
-                BOOL _isReplace = NO , _isReplaceMore = NO;
                 if (_isReplaceMoreName){
                     NSArray *moreKeys = ClassMoresKeys[name];
                     if (moreKeys) {
-                        _isReplaceMore = YES;
                         meta->_replaceMoreNames = moreKeys;
                         [self->_MappingMorePropertyMetas addObject:meta];
                         continue;
@@ -207,17 +205,13 @@
                 }
                 if (_isReplaceName){
                     NSString *replaceName =  replaceNameDict[name];
-                    if (replaceName && _isReplaceMore == NO) {
-                        _isReplace = YES;
+                    if (replaceName ) {
                         meta->_replaceName = replaceName;
                         [self->_MappingPropertyMetas addObject:meta];
                         continue;
                     }
                 }
-                if (!_isReplaceMore  && !_isReplace) {
-                    [self->_PropertyMetas addObject:meta];
-                    
-                }
+                [self->_PropertyMetas addObject:meta];
             }
             free(ivars);
             c = class_getSuperclass(c);

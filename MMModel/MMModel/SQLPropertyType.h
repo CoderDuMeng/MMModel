@@ -36,7 +36,7 @@ typedef enum {
     _typeNSDictionary,
     _typeNSMutableDictionary,
     _typeNSURL,
-     _typeNSDate,
+    _typeNSDate,
     _typeNSNumber,
     _typeNSDecimalNumber,
     _typeNSValue,

@@ -29,6 +29,7 @@
     [self arrayProertyWithModel]; //<<数组字典转数组模型
     [self propertyBlackList];   //<<黑名单
     [self propertyWhiteList];   //<<白名单
+  
     
 }
 
